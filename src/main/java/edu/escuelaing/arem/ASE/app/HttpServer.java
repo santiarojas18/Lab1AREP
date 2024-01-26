@@ -1,11 +1,15 @@
 package edu.escuelaing.arem.ASE.app;
 import java.net.*;
 import java.io.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HttpServer {
+    private static ConcurrentHashMap<String, StringBuffer> cache;
     public static void main(String[] args) throws IOException {
+        cache = new ConcurrentHashMap<>();
+
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(35000);
@@ -33,6 +37,7 @@ public class HttpServer {
 
             //Initializing the movieTitle to be searched
             String movieTitle = "";
+
             //External connection api
             HttpConnectionExample connectionToApi = new HttpConnectionExample();
             StringBuffer apiResponse = new StringBuffer();
@@ -54,8 +59,15 @@ public class HttpServer {
                     }
                     giveMovieInfo = true;
                     System.out.println("API's being called and the title is: " + movieTitle);
-                    //External API request
-                    apiResponse = connectionToApi.getMovieInfo(movieTitle);
+
+                    //Verifies if the movie title has not been requested
+                    if (!cache.containsKey(movieTitle)) {
+                        //External API request
+                        apiResponse = connectionToApi.getMovieInfo(movieTitle);
+                        cache.put(movieTitle, apiResponse);
+                    } else {
+                        apiResponse = cache.get(movieTitle);
+                    }
                     System.out.println(apiResponse);
                 }
                 if (!in.ready()) {
