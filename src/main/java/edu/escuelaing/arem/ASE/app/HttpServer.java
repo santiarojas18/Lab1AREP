@@ -81,7 +81,7 @@ public class HttpServer {
                     + "<!DOCTYPE html>\n" +
                     "<html>\n" +
                     "    <head>\n" +
-                    "        <title>Form Example</title>\n" +
+                    "        <title>Movies Info</title>\n" +
                     "        <meta charset=\"UTF-8\">\n" +
                     "        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
                     "    </head>\n" +
@@ -95,13 +95,38 @@ public class HttpServer {
                     "        <div id=\"getrespmsg\"></div>\n" +
                     "\n" +
                     "        <script>\n" +
+                    "            function formatJSON(jsonObj) {\n" +
+                    "               let htmlOutput = \"<ul>\";\n" +
+                    "\n" +
+                    "               for (let key in jsonObj) {\n" +
+                    "                   if (jsonObj.hasOwnProperty(key)) {\n" +
+                    "                       htmlOutput += \"<li><strong>\" + key + \":</strong> \";\n" +
+                    "\n" +
+                    "                        if (key === \"Poster\" && typeof jsonObj[key] === \"string\") {\n" +
+                    "                           // Si la llave es \"Poster\" y el valor es una cadena, crea una etiqueta de imagen\n" +
+                    "                           htmlOutput += \"<img src='\" + jsonObj[key] + \"' alt='Poster'>\";\n" +
+                    "                        } else if (typeof jsonObj[key] === \"object\") {\n" +
+                    "                           // Si es un objeto, recursivamente formatea sus propiedades\n" +
+                    "                           htmlOutput += formatJSON(jsonObj[key]);\n" +
+                    "                        } else {\n" +
+                    "                           // Si es un valor simple, agrégalo directamente\n" +
+                    "                           htmlOutput += jsonObj[key];\n" +
+                    "                        }\n" +
+                    "\n" +
+                    "                   htmlOutput += \"</li>\";\n" +
+                    "                   }\n" +
+                    "               }\n" +
+                    "\n" +
+                    "               htmlOutput += \"</ul>\";\n" +
+                    "               return htmlOutput;\n" +
+                    "           }\n"+
                     "            function loadGetMsg() {\n" +
                     "                let nameVar = document.getElementById(\"name\").value;\n" +
                     "                const xhttp = new XMLHttpRequest();\n" +
                     "                xhttp.onload = function() {\n" +
                     "                    try {\n" +
                     "                         response = JSON.parse(this.responseText);\n"+
-                    "                         const formattedOutput = JSON.stringify(response, null, 2);\n"+
+                    "                         const formattedOutput = formatJSON(response);\n"+
                     "                         document.getElementById(\"getrespmsg\").innerHTML = \"<pre>\" + formattedOutput + \"</pre>\";\n"+
                     "                     } catch (error) {\n"+
                     "                         document.getElementById(\"getrespmsg\").innerHTML =\n" +
